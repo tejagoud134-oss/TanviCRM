@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: tanvi_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres_tanvi_pwd}
+      POSTGRES_DB: ${POSTGRES_DB:-tanvi_boutique}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - tanvi_network
+
+  fastapi:
+    build:
+      context: ./backend
+      dockerfile: app.Dockerfile
+    container_name: tanvi_fastapi
+    restart: always
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres_tanvi_pwd}@db:5432/${POSTGRES_DB:-tanvi_boutique}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_ALGORITHM=${JWT_ALGORITHM}
+      - SEED_ADMIN_EMAIL=${SEED_ADMIN_EMAIL}
+      - SEED_ADMIN_PASSWORD=${SEED_ADMIN_PASSWORD}
+      - SEED_STAFF_EMAIL=${SEED_STAFF_EMAIL}
+      - SEED_STAFF_PASSWORD=${SEED_STAFF_PASSWORD}
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    networks:
+      - tanvi_network
+
+  node-gateway:
+    build:
+      context: ./backend/node-server
+      dockerfile: Dockerfile
+    container_name: tanvi_node_gateway
+    restart: always
+    environment:
+      - PORT=3000
+      - FASTAPI_URL=http://fastapi:8000
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres_tanvi_pwd}@db:5432/${POSTGRES_DB:-tanvi_boutique}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_ALGORITHM=${JWT_ALGORITHM}
+      - NODE_ENV=production
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+      - fastapi
+    volumes:
+      - ./backend/uploads:/usr/src/app/uploads
+    networks:
+      - tanvi_network
+
+volumes:
+  pgdata:
+
+networks:
+  tanvi_network:
+    driver: bridge
