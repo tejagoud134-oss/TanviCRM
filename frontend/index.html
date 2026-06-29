@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tanvi Boutique - Event & Trunk Show Management System</title>
+  <!-- Google Fonts & Styles -->
+  <link rel="stylesheet" href="styles.css">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Chart.js, Axios, Socket.io CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.7.5/dist/socket.io.min.js"></script>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    @keyframes scanLaser {
+      0% { top: 0; }
+      50% { top: 236px; }
+      100% { top: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. LOGIN OVERLAY (Step 1) -->
+  <div id="loginOverlay" class="login-overlay">
+    <div class="login-card">
+      <div class="login-logo">
+        TANVI BOUTIQUE
+        <span>Fashion Event Suite</span>
+      </div>
+      <p class="login-tagline">Manage exclusive trunk shows, designer guest lists, and live event check-ins.</p>
+      
+      <div class="form-group" style="margin-bottom: 16px; text-align: left;">
+        <label class="form-label">Select Profile Portal</label>
+        <div class="role-selectors">
+          <div id="roleStaff" class="role-btn selected" onclick="selectRole('Staff')">
+            <i class="fa-solid fa-user-tie"></i>
+            <span>Staff Portal</span>
+          </div>
+          <div id="roleAdmin" class="role-btn" onclick="selectRole('Admin')">
+            <i class="fa-solid fa-user-shield"></i>
+            <span>Admin Portal</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Credentials Fields -->
+      <div class="form-group" style="margin-bottom: 12px; text-align: left;">
+        <label class="form-label" for="loginEmail">Email Address</label>
+        <input type="email" id="loginEmail" class="form-control" value="staff@tanviboutique.com" required>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 24px; text-align: left;">
+        <label class="form-label" for="loginPassword">Password</label>
+        <input type="password" id="loginPassword" class="form-control" value="StaffPass123!" required>
+      </div>
+      
+      <button class="btn btn-primary" style="width: 100%;" onclick="performLogin()">
+        Enter Management Suite <i class="fa-solid fa-arrow-right-to-bracket"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- 2. MAIN APPLICATION LAYER -->
+  <div class="app-container">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div>
+        <div class="brand-section">
+          <a href="#" class="brand-logo" onclick="switchView('dashboard')">
+            TANVI
+            <span>Boutique Events</span>
+          </a>
+        </div>
+        <ul class="nav-menu">
+          <li class="nav-item active" id="nav-dashboard">
+            <a href="#" onclick="switchView('dashboard')">
+              <i class="fa-solid fa-chart-line"></i>
+              Dashboard
+            </a>
+          </li>
+          <li class="nav-item" id="nav-scheduler">
+            <a href="#" onclick="switchView('scheduler')">
+              <i class="fa-solid fa-calendar-plus"></i>
+              Event Scheduler
+            </a>
+          </li>
+          <li class="nav-item" id="nav-guests">
+            <a href="#" onclick="switchView('guests')">
+              <i class="fa-solid fa-users"></i>
+              Guest & RSVP Manager
+            </a>
+          </li>
+          <li class="nav-item" id="nav-coordination">
+            <a href="#" onclick="switchView('coordination')">
+              <i class="fa-solid fa-clipboard-user"></i>
+              Live Check-In
+            </a>
+          </li>
+          <li class="nav-item" id="nav-analytics">
+            <a href="#" onclick="switchView('analytics')">
+              <i class="fa-solid fa-chart-pie"></i>
+              Analytics & Reports
+            </a>
+          </li>
+          <li class="nav-item" id="nav-inventory">
+            <a href="#" onclick="switchView('inventory')">
+              <i class="fa-solid fa-boxes-stacked"></i>
+              Inventory Manager
+            </a>
+          </li>
+          <li class="nav-item" id="nav-settings">
+            <a href="#" onclick="switchView('settings')">
+              <i class="fa-solid fa-sliders"></i>
+              System Settings
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="user-profile">
+          <div class="avatar" id="userAvatar">S</div>
+          <div class="profile-info">
+            <span class="profile-name" id="userName">Boutique Staff</span>
+            <span class="profile-role" id="userRoleBadge">Staff Role</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Panel Wrapper -->
+    <main class="main-content">
+      
+      <!-- Top Nav -->
+      <nav class="top-nav">
+        <div class="page-title">
+          <h2 id="currentViewTitle">Dashboard</h2>
+        </div>
+        <div class="nav-actions">
+          <!-- Branch Selector -->
+          <div class="branch-selector-wrapper" style="margin-right: 12px; display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-store" style="color: var(--accent-gold);"></i>
+            <select id="branchSelect" class="form-control" style="padding: 6px 12px; font-size: 0.85rem; background-color: var(--bg-cream); color: var(--text-dark);" onchange="changeBranch()">
+              <option value="Mumbai Colaba">Mumbai - Colaba</option>
+              <option value="Delhi Mehrauli">Delhi - Mehrauli</option>
+              <option value="Hyderabad Banjara">Hyderabad - Banjara</option>
+            </select>
+          </div>
+          <!-- Language Selector -->
+          <div class="language-selector-wrapper" style="margin-right: 16px; display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-language" style="color: var(--accent-gold); font-size: 1.1rem;"></i>
+            <select id="langSelect" class="form-control" style="padding: 6px 12px; font-size: 0.85rem; background-color: var(--bg-cream); color: var(--text-dark);" onchange="changeLanguage()">
+              <option value="en">English</option>
+              <option value="hi">Hindi (हिन्दी)</option>
+              <option value="es">Spanish (Español)</option>
+            </select>
+          </div>
+          <button class="notification-trigger" onclick="openAlertsModal()">
+            <i class="fa-solid fa-bell"></i>
+            <span class="badge-dot" id="activeAlertBadge"></span>
+          </button>
+          <button class="logout-btn" onclick="performLogout()">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            Sign Out
+          </button>
+        </div>
+      </nav>
+
+      <!-- View Container Panels -->
+      <div class="content-panel">
+
+        <!-- A. DASHBOARD VIEW -->
+        <section id="view-dashboard" class="view-section active">
+          <!-- Metrics Grid -->
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <div class="metric-info">
+                <h3>Total Events</h3>
+                <div class="metric-value" id="metricTotalEvents">0</div>
+                <div class="metric-sub" id="metricUpcomingEventsCount">0 upcoming</div>
+              </div>
+              <div class="metric-icon-box"><i class="fa-solid fa-calendar"></i></div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-info">
+                <h3>Total RSVPs</h3>
+                <div class="metric-value" id="metricTotalRSVPs">0</div>
+                <div class="metric-sub" id="metricConfirmedRSVPs">0 confirmed</div>
+              </div>
+              <div class="metric-icon-box"><i class="fa-solid fa-user-check"></i></div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-info">
+                <h3>Attendance Rate</h3>
+                <div class="metric-value" id="metricAttendanceRate">0%</div>
+                <div class="metric-sub" id="metricAttendanceSub">Based on live events</div>
+              </div>
+              <div class="metric-icon-box"><i class="fa-solid fa-percent"></i></div>
+            </div>
+            <div class="metric-card" id="alertMetricCard">
+              <div class="metric-info">
+                <h3>System Alerts</h3>
+                <div class="metric-value" id="metricAlertCount">0</div>
+                <div class="metric-sub danger" id="metricAlertSub">Immediate attention required</div>
+              </div>
+              <div class="metric-icon-box"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            </div>
+          </div>
+
+          <!-- Two Column Widgets Layout -->
+          <div class="dashboard-layout">
+            <!-- Left: Calendar and Upcoming events -->
+            <div class="calendar-widget">
+              <div class="widget-card">
+                <div class="widget-title">
+                  <h3><i class="fa-solid fa-calendar-days" style="color: var(--accent-gold); margin-right: 8px;"></i> Boutique Calendar</h3>
+                  <div class="calendar-header">
+                    <button class="btn btn-secondary btn-sm" onclick="changeMonth(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+                    <span class="calendar-month-name" id="calendarMonthLabel">June 2026</span>
+                    <button class="btn btn-secondary btn-sm" onclick="changeMonth(1)"><i class="fa-solid fa-chevron-right"></i></button>
+                  </div>
+                </div>
+                <div class="calendar-container">
+                  <div class="calendar-grid" id="calendarGrid">
+                    <!-- Dynamic Days -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quick List of upcoming trunk shows -->
+              <div class="widget-card">
+                <div class="widget-title">
+                  <h3>Upcoming Fashion Events</h3>
+                  <button class="btn btn-text btn-sm" onclick="switchView('scheduler')">Schedule New <i class="fa-solid fa-plus"></i></button>
+                </div>
+                <div class="table-responsive">
+                  <table class="custom-table">
+                    <thead>
+                      <tr>
+                        <th>Event Name</th>
+                        <th>Type</th>
+                        <th>Date & Time</th>
+                        <th>Capacity Limit</th>
+                        <th>RSVPs</th>
+                      </tr>
+                    </thead>
+                    <tbody id="quickEventsTableBody">
+                      <!-- Dynamic upcoming list -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Dynamic Alerts & Type Dist Chart -->
+            <div class="alerts-chart-widget">
+              <div class="widget-card">
+                <div class="widget-title">
+                  <h3>Recent System Alerts</h3>
+                  <button class="btn btn-text btn-sm" onclick="clearAllAlerts()">Dismiss All</button>
+                </div>
+                <div class="alerts-list" id="dashboardAlertsList">
+                  <!-- Dynamic alert items -->
+                </div>
+              </div>
+
+              <div class="widget-card">
+                <div class="widget-title">
+                  <h3>Event Distribution</h3>
+                </div>
+                <div style="height: 240px; position: relative; display: flex; justify-content: center; align-items: center;">
+                  <canvas id="eventTypePieChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- B. EVENT SCHEDULER VIEW (Step 2 & 3) -->
+        <section id="view-scheduler" class="view-section">
+          <div class="widget-card">
+            <h3 class="luxury-heading">Create Event & Trunk Show Entry Form</h3>
+            
+            <!-- Dynamic validation feedback banner -->
+            <div id="schedulerFormAlert" style="display: none; padding: 12px; margin-bottom: 20px; border-radius: var(--border-radius-md);" class="alert-item danger">
+              <i class="fa-solid fa-circle-xmark"></i>
+              <div class="alert-content" id="schedulerFormAlertMsg">Please fix validation errors.</div>
+            </div>
+
+            <form id="eventEntryForm" onsubmit="handleEventSubmit(event)">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label" for="eventName">Event Name *</label>
+                  <input type="text" id="eventName" class="form-control" placeholder="e.g. Sabyasachi Summer Trunk Show" required>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="eventType">Event Type *</label>
+                  <select id="eventType" class="form-control" required>
+                    <option value="Trunk Show">Designer Trunk Show</option>
+                    <option value="Private Shopping">Private Styling Experience</option>
+                    <option value="Designer Event">VIP Launch Showcase</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="eventDate">Event Date *</label>
+                  <input type="date" id="eventDate" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="eventTime">Start Time *</label>
+                  <input type="time" id="eventTime" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="eventCapacity">Boutique Guest Limit (Max Capacity) *</label>
+                  <input type="number" id="eventCapacity" class="form-control" min="5" max="100" placeholder="e.g. 30" required>
+                  <span class="checklist-meta">Maximum threshold based on physical showroom slot bounds.</span>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="featuredDesigner">Featured Designer / Collection Label *</label>
+                  <input type="text" id="featuredDesigner" class="form-control" placeholder="e.g. Silk Banarasi & Zardozi Heritage Collection" required>
+                </div>
+
+                <div class="form-group full-width">
+                  <label class="form-label" for="eventNotes">Description & Styling Notes</label>
+                  <textarea id="eventNotes" class="form-control" placeholder="Mention special styling setup or guest dresscode..."></textarea>
+                </div>
+              </div>
+
+              <div style="margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px;">
+                <button type="button" class="btn btn-secondary" onclick="resetForm('eventEntryForm')">Clear Form</button>
+                <button type="submit" class="btn btn-primary">Save Event & Validate Booking <i class="fa-solid fa-circle-check"></i></button>
+              </div>
+            </form>
+          </div>
+
+          <!-- All Registered Events Table -->
+          <div class="widget-card">
+            <div class="widget-title">
+              <h3>Boutique Event Schedule Registry</h3>
+              <div class="search-control-container" style="max-width: 300px;">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="eventSearchInput" oninput="filterEventsTable()" class="search-input" placeholder="Search events...">
+              </div>
+            </div>
+            
+            <div class="table-responsive">
+              <table class="custom-table" id="registryEventsTable">
+                <thead>
+                  <tr>
+                    <th>Event Name</th>
+                    <th>Type</th>
+                    <th>Date & Time</th>
+                    <th>Capacity Limit</th>
+                    <th>Featured Collection</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="registryEventsTableBody">
+                  <!-- Dynamic event registry entries -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- C. GUEST & RSVP MANAGER VIEW (Step 2 & 4) -->
+        <section id="view-guests" class="view-section">
+          <div class="widget-card">
+            <h3 class="luxury-heading">Add Guest & RSVP Registration Form</h3>
+            
+            <!-- Dynamic validation feedback banner for RSVPs -->
+            <div id="guestFormAlert" style="display: none; padding: 12px; margin-bottom: 20px; border-radius: var(--border-radius-md);" class="alert-item danger">
+              <i class="fa-solid fa-circle-xmark"></i>
+              <div class="alert-content" id="guestFormAlertMsg">Please fix errors.</div>
+            </div>
+
+            <form id="guestEntryForm" onsubmit="handleGuestSubmit(event)">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label" for="guestName">Guest Full Name *</label>
+                  <input type="text" id="guestName" class="form-control" placeholder="e.g. Radhika Merchant" required>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="guestEvent">Assign to Boutique Event *</label>
+                  <select id="guestEvent" class="form-control" required>
+                    <!-- Dynamically populated options -->
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="guestPhone">Contact Number (WhatsApp Enabled) *</label>
+                  <input type="tel" id="guestPhone" class="form-control" placeholder="e.g. +91 98765 43210" required>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="guestEmail">Email Address *</label>
+                  <input type="email" id="guestEmail" class="form-control" placeholder="e.g. radhika@gmail.com" required>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="guestVip">VIP Membership Level *</label>
+                  <select id="guestVip" class="form-control" required>
+                    <option value="Elite">Elite VIP (Personal Styling & Fitting Room)</option>
+                    <option value="Gold">Gold Guest (Reserved Row & High Tea)</option>
+                    <option value="Regular">Regular (Showroom entry)</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="guestRsvp">RSVP Status *</label>
+                  <select id="guestRsvp" class="form-control" required>
+                    <option value="Confirmed">Confirmed</option>
+                    <option value="Pending">Pending Invitation</option>
+                    <option value="Declined">Declined</option>
+                  </select>
+                </div>
+
+                <div class="form-group full-width">
+                  <label class="form-label" for="guestNotes">Special Fashion Styling Preferences</label>
+                  <textarea id="guestNotes" class="form-control" placeholder="Note down dress sizing, designer preferences (e.g. Banarasi Sarees, Embroidery), or high-value purchase history..."></textarea>
+                </div>
+              </div>
+
+              <div style="margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px;">
+                <button type="button" class="btn btn-secondary" onclick="resetForm('guestEntryForm')">Clear Form</button>
+                <button type="submit" class="btn btn-primary">Process RSVP Registry <i class="fa-solid fa-user-plus"></i></button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Guest RSVP Records Dashboard -->
+          <div class="widget-card">
+            <div class="widget-title">
+              <h3>Boutique Guest List & RSVP Registry</h3>
+            </div>
+            
+            <!-- Search & Filters -->
+            <div class="filter-row">
+              <div class="search-control-container" style="max-width: 300px; flex-grow: 1;">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="guestSearchInput" oninput="filterGuestsTable()" class="search-input" placeholder="Search guests by name or contact...">
+              </div>
+              
+              <div class="form-group" style="flex-direction: row; align-items: center; gap: 8px; margin: 0;">
+                <span class="form-label" style="white-space: nowrap;">Event Filter:</span>
+                <select id="guestTableEventFilter" class="form-control" style="padding: 8px 16px;" onchange="filterGuestsTable()">
+                  <option value="All">All Events</option>
+                  <!-- Dynamically populated options -->
+                </select>
+              </div>
+
+              <div class="form-group" style="flex-direction: row; align-items: center; gap: 8px; margin: 0;">
+                <span class="form-label" style="white-space: nowrap;">RSVP:</span>
+                <select id="guestTableRsvpFilter" class="form-control" style="padding: 8px 16px;" onchange="filterGuestsTable()">
+                  <option value="All">All Statuses</option>
+                  <option value="Confirmed">Confirmed</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Declined">Declined</option>
+                </select>
+              </div>
+
+              <div class="form-group" style="flex-direction: row; align-items: center; gap: 8px; margin: 0;">
+                <span class="form-label" style="white-space: nowrap;">VIP:</span>
+                <select id="guestTableVipFilter" class="form-control" style="padding: 8px 16px;" onchange="filterGuestsTable()">
+                  <option value="All">All Tiers</option>
+                  <option value="Elite">Elite VIP</option>
+                  <option value="Gold">Gold Guest</option>
+                  <option value="Regular">Regular</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="custom-table" id="registryGuestsTable">
+                <thead>
+                  <tr>
+                    <th>Guest Name</th>
+                    <th>Assigned Event</th>
+                    <th>VIP Tier</th>
+                    <th>Contact Info</th>
+                    <th>RSVP Status</th>
+                    <th>Styling Notes</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="registryGuestsTableBody">
+                  <!-- Dynamic guest registry rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- D. LIVE EVENT DAY COORDINATION BOARD (Step 4 & 5) -->
+        <section id="view-coordination" class="view-section">
+          <!-- Selection & Overview Header -->
+          <div class="coordination-selector">
+            <i class="fa-solid fa-clipboard-check" style="font-size: 1.5rem; color: var(--accent-gold);"></i>
+            <div class="form-group" style="flex-direction: row; align-items: center; gap: 12px; margin: 0; flex-grow: 1;">
+              <span class="form-label" style="white-space: nowrap;">Select Active Event for Day Coordination:</span>
+              <select id="coordinationEventSelect" class="form-control" onchange="loadCoordinationEventData()" style="max-width: 400px;">
+                <!-- Dynamically populated options -->
+              </select>
+            </div>
+            <div id="coordinationStatusBadge">
+              <span class="badge badge-emerald"><i class="fa-solid fa-circle-dot" style="margin-right: 4px; animation: flash 1s infinite alternate;"></i> Active Day</span>
+            </div>
+          </div>
+
+          <div class="coordination-layout">
+            <!-- Left: Check-in Checklist -->
+            <div class="widget-card live-card">
+              <div class="widget-title" style="flex-wrap: wrap; gap: 12px;">
+                <h3>Boutique Check-In Checklist</h3>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                  <button class="btn btn-gold btn-sm" onclick="openQRScanModal()" style="display: flex; align-items: center; gap: 6px; padding: 6px 12px;">
+                    <i class="fa-solid fa-qrcode"></i> Scan QR Ticket
+                  </button>
+                  <div class="search-control-container" style="max-width: 200px; margin: 0;">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" id="checkinSearchInput" oninput="filterCheckinList()" class="search-input" placeholder="Search guests...">
+                  </div>
+                </div>
+              </div>
+              
+              <div class="filter-row">
+                <button class="btn btn-secondary btn-sm" onclick="filterCheckinStatus('All')">All Invited</button>
+                <button class="btn btn-secondary btn-sm" onclick="filterCheckinStatus('Confirmed')">RSVP Confirmed</button>
+                <button class="btn btn-secondary btn-sm" onclick="filterCheckinStatus('Checked In')">Checked In (<span id="btnCheckinCount">0</span>)</button>
+                <button class="btn btn-secondary btn-sm" onclick="filterCheckinStatus('Absent')">Not Here Yet</button>
+              </div>
+
+              <div id="checkinChecklistList" style="display: flex; flex-direction: column; border: 1px solid var(--border-color); border-radius: var(--border-radius-md); background-color: var(--bg-white);">
+                <!-- Dynamic check-in lists -->
+              </div>
+            </div>
+
+            <!-- Right: Real-time capacity counter and social media buzz tracker -->
+            <div>
+              <!-- Live seats counter -->
+              <div class="live-seat-counter">
+                <div class="live-seat-number" id="liveSeatNumbers">0 / 0</div>
+                <div class="live-seat-label">Live Checked-In Attendees / Salon Space Limit</div>
+                <div class="progress-bar-container">
+                  <div class="progress-bar" id="liveCapacityProgressBar"></div>
+                </div>
+                <div class="checklist-meta" style="margin-top: 12px; font-weight: 500;" id="liveCapacitySub">
+                  VIP Capacity Status: Normal Room Space
+                </div>
+              </div>
+
+              <!-- Social Buzz & VIP Styling triggers -->
+              <div class="widget-card">
+                <div class="widget-title">
+                  <h3>Social Buzz & Consult Triggers</h3>
+                </div>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+                  Generate live event stories, share stylist matches, and buzz notifications to drive engagement.
+                </p>
+                <div class="buzz-actions">
+                  <div class="buzz-card">
+                    <div>
+                      <p><strong>Announce Trunk Show Opening</strong></p>
+                      <span class="buzz-meta">Ready template for Instagram/WhatsApp story.</span>
+                    </div>
+                    <button class="btn btn-gold btn-sm" onclick="triggerSocialBuzz('opening')">Share <i class="fa-solid fa-paper-plane"></i></button>
+                  </div>
+                  <div class="buzz-card">
+                    <div>
+                      <p><strong>Styling Consultation Match Alert</strong></p>
+                      <span class="buzz-meta">Auto-ping checked-in VIPs with assigned stylists.</span>
+                    </div>
+                    <button class="btn btn-primary btn-sm" onclick="triggerSocialBuzz('styling')">Assign <i class="fa-solid fa-wand-magic-sparkles"></i></button>
+                  </div>
+                  <div class="buzz-card">
+                    <div>
+                      <p><strong>VIP Showcase Highlight</strong></p>
+                      <span class="buzz-meta">Share a high-value outfit match event card.</span>
+                    </div>
+                    <button class="btn btn-secondary btn-sm" onclick="triggerSocialBuzz('highlight')">Post <i class="fa-solid fa-star"></i></button>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Event Live Activity Feed -->
+              <div class="widget-card">
+                <div class="widget-title">
+                  <h3>Event Live Activity Feed</h3>
+                </div>
+                <div class="alerts-list" id="coordinationFeedList" style="max-height: 180px;">
+                  <!-- Live check in feeds -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- E. ANALYTICS & REPORTING VIEW (Step 6) -->
+        <section id="view-analytics" class="view-section">
+          <!-- Charts & Summaries -->
+          <div class="dashboard-layout">
+            <div class="widget-card">
+              <div class="widget-title">
+                <h3>VIP RSVP & Attendance Conversion Trends</h3>
+              </div>
+              <div style="height: 300px; position: relative;">
+                <canvas id="analyticsConversionChart"></canvas>
+              </div>
+            </div>
+
+            <div class="widget-card">
+              <div class="widget-title">
+                <h3>Featured Designer Interest Analytics</h3>
+              </div>
+              <div style="height: 300px; position: relative; display: flex; justify-content: center; align-items: center;">
+                <canvas id="analyticsLabelsBarChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Predictive Analytics Forecasting Panel -->
+          <div class="widget-card">
+            <div class="widget-title">
+              <h3><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--accent-gold); margin-right: 8px;"></i> Predictive Turnout & Demand Forecasts (AI Engine)</h3>
+              <span class="badge badge-gold" id="forecastConfidence">ML Model: 88% Confidence</span>
+            </div>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px;">
+              Predicts upcoming trunk show turnout rates based on VIP guest distributions and identifies trending designers.
+            </p>
+            <div class="dashboard-layout" style="margin-bottom: 0;">
+              <div>
+                <p style="font-size: 0.85rem; font-weight: 600; margin-bottom: 8px;">Salon Turnout Predictions</p>
+                <div class="table-responsive" style="max-height: 150px;">
+                  <table class="custom-table" style="font-size: 0.85rem;">
+                    <thead>
+                      <tr>
+                        <th>Upcoming Event</th>
+                        <th>RSVPs</th>
+                        <th>Predicted Attendance</th>
+                        <th>Occupancy Risk</th>
+                      </tr>
+                    </thead>
+                    <tbody id="predictiveTurnoutBody">
+                      <!-- Dynamic Predictions -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div style="background: var(--bg-cream); padding: 16px; border-radius: var(--border-radius-md); border-left: 4px solid var(--primary-emerald); display: flex; flex-direction: column; justify-content: center; gap: 12px;">
+                <div>
+                  <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 500;">PREDICTED PEAK SALON TRAFFIC</span>
+                  <div style="font-size: 1.5rem; font-weight: bold; color: var(--primary-emerald-dark);" id="predPeakTraffic">14:00 PM</div>
+                </div>
+                <div>
+                  <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 500;">FORECASTED HIGHEST DEMAND DESIGNER</span>
+                  <div style="font-size: 1.4rem; font-weight: bold; color: var(--accent-gold-dark);" id="predTopDesigner">Sabyasachi Mukherjee</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Reports Exporter -->
+          <div class="widget-card">
+            <div class="widget-title">
+              <h3>Boutique Management Export Panel</h3>
+            </div>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 24px;">
+              Compile and generate formal CSV spreadsheets of Boutique Events, Guest RSVPs, styling notes, and check-in statuses for administrative bookkeeping.
+            </p>
+            <div class="form-grid" style="margin-bottom: 24px;">
+              <div class="form-group">
+                <label class="form-label" for="reportType">Export Data Source</label>
+                <select id="reportType" class="form-control">
+                  <option value="all">Full Database Dump (Events, Guests, Rules)</option>
+                  <option value="events">All Registered Events Schedule</option>
+                  <option value="guests">Guest RSVP Registry & Contact Lists</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="reportFormat">File Format</label>
+                <select id="reportFormat" class="form-control" disabled>
+                  <option value="csv">CSV Spreadsheet (.csv)</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="exportDataReport()">
+              Compile & Export Spreadsheet <i class="fa-solid fa-file-csv"></i>
+            </button>
+          </div>
+        </section>
+
+
+        <!-- F. SYSTEM SETTINGS & ADMIN PANEL (Step 7) -->
+        <section id="view-settings" class="view-section">
+          <!-- Business Rules Config -->
+          <div class="widget-card">
+            <h3 class="luxury-heading">Boutique Capacity & RSVP Scheduling Threshold Rules</h3>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 24px;">
+              Admin-level thresholds governing showroom capacities, notification delays, and buzz templates. Modifying these rules triggers recalculations.
+            </p>
+
+            <div class="rule-card">
+              <div class="rule-details">
+                <h4>Salon Space Max Limit Warning Threshold</h4>
+                <p>Triggers warning alert if checked-in guests exceed a percentage of physical room capacity.</p>
+              </div>
+              <div class="rule-input-group">
+                <input type="number" id="ruleVipWarningPercent" class="rule-number-input" min="50" max="100" value="90">
+                <span class="form-label">%</span>
+              </div>
+            </div>
+
+            <div class="rule-card">
+              <div class="rule-details">
+                <h4>Minimum Advance Booking Days</h4>
+                <p>Restricts scheduling any Trunk Show or event that is too close to today's date.</p>
+              </div>
+              <div class="rule-input-group">
+                <input type="number" id="ruleMinAdvanceDays" class="rule-number-input" min="1" max="30" value="3">
+                <span class="form-label">Days</span>
+              </div>
+            </div>
+
+            <div class="rule-card">
+              <div class="rule-details">
+                <h4>Maximum RSVP Limit per Elite VIP Event</h4>
+                <p>Enforces a hard limit boundary on guest confirms for private designer trunk showcases.</p>
+              </div>
+              <div class="rule-input-group">
+                <input type="number" id="ruleMaxEliteRsvps" class="rule-number-input" min="5" max="50" value="25">
+                <span class="form-label">Guests</span>
+              </div>
+            </div>
+
+            <div style="margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px;">
+              <button class="btn btn-secondary" onclick="resetRulesToDefault()">Reset Defaults</button>
+              <button class="btn btn-primary" onclick="saveSystemRules()">Save Rule Settings & Re-evaluate <i class="fa-solid fa-floppy-disk"></i></button>
+            </div>
+          </div>
+
+          <!-- Audit Logs Tracking -->
+          <div class="widget-card">
+            <div class="widget-title">
+              <h3>System Event Audit Logs (Read-Only)</h3>
+              <button class="btn btn-secondary btn-sm" onclick="clearAuditLogs()"><i class="fa-solid fa-trash-can"></i> Clear Logs</button>
+            </div>
+            <div class="table-responsive" style="max-height: 250px;">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>Timestamp</th>
+                    <th>Staff User</th>
+                    <th>Action Activity</th>
+                    <th>Impact Details</th>
+                  </tr>
+                </thead>
+                <tbody id="auditLogsTableBody">
+                  <!-- Dynamic Audit entries -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Cloud Backup & Disaster Recovery Card -->
+          <div class="widget-card">
+            <div class="widget-title">
+              <h3><i class="fa-solid fa-cloud-arrow-up" style="color: var(--accent-gold); margin-right: 8px;"></i> Cloud Backups & Disaster Recovery</h3>
+              <button class="btn btn-primary btn-sm" onclick="triggerCloudBackup()">Generate S3 Cloud Snapshot <i class="fa-solid fa-rotate"></i></button>
+            </div>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px;">
+              Backup system state to JSON files and upload securely to AWS S3 cloud backup repository. Select previous snapshots to restore system state in case of hardware failures.
+            </p>
+            <div class="table-responsive" style="max-height: 200px;">
+              <table class="custom-table" style="font-size: 0.85rem;">
+                <thead>
+                  <tr>
+                    <th>Snapshot Filename</th>
+                    <th>Size (Bytes)</th>
+                    <th>Backup Time</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="backupHistoryBody">
+                  <!-- Dynamic backups -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- G. INVENTORY MANAGER VIEW -->
+        <section id="view-inventory" class="view-section">
+          <div class="dashboard-layout">
+            <!-- Left: Add/Edit Product form -->
+            <div class="widget-card">
+              <h3 class="luxury-heading">Register Boutique Product</h3>
+              <form id="productEntryForm" onsubmit="handleProductSubmit(event)">
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label class="form-label" for="prodTitle">Product Name *</label>
+                    <input type="text" id="prodTitle" class="form-control" placeholder="e.g. Sabyasachi Banarasi Saree" required>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="prodPrice">Price (INR) *</label>
+                    <input type="number" id="prodPrice" class="form-control" min="100" placeholder="e.g. 250000" required>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="prodCategory">Category *</label>
+                    <select id="prodCategory" class="form-control" required>
+                      <option value="Saree">Designer Saree</option>
+                      <option value="Lehenga">Bridal Lehenga</option>
+                      <option value="Gown">Fusion Gown</option>
+                      <option value="Sherwani">Bespoke Sherwani</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="prodStock">Stock Level *</label>
+                    <input type="number" id="prodStock" class="form-control" min="0" placeholder="e.g. 5" required>
+                  </div>
+                  <div class="form-group full-width">
+                    <label class="form-label" for="prodDescription">Product Description</label>
+                    <textarea id="prodDescription" class="form-control" placeholder="Describe fabric weave, thread work details, blouse matching availability..."></textarea>
+                  </div>
+                </div>
+                <div style="margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px;">
+                  <button type="button" class="btn btn-secondary" onclick="resetForm('productEntryForm')">Clear Form</button>
+                  <button type="submit" class="btn btn-primary">Save Product Entry <i class="fa-solid fa-save"></i></button>
+                </div>
+              </form>
+            </div>
+            <!-- Right: Stock table -->
+            <div class="widget-card">
+              <div class="widget-title">
+                <h3>Current Stock & Inventory Levels</h3>
+              </div>
+              <div class="table-responsive">
+                <table class="custom-table">
+                  <thead>
+                    <tr>
+                      <th>Product</th>
+                      <th>Category</th>
+                      <th>Price</th>
+                      <th>Stock Quantity</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="inventoryTableBody">
+                    <!-- Dynamic inventory rows -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- 3. DIALOG MODALS -->
+  <!-- Alert Center Modal -->
+  <div class="modal-overlay" id="alertsModalOverlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-bell" style="color: var(--accent-gold); margin-right: 8px;"></i> Active System Notifications</h3>
+        <button class="modal-close" onclick="closeAlertsModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="alertsModalList" style="display: flex; flex-direction: column; gap: 12px;">
+        <!-- Full notifications lists -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeAlertsModal()">Close</button>
+        <button class="btn btn-primary" onclick="clearAllAlerts(); closeAlertsModal()">Acknowledge & Dismiss All</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick View Details Modal -->
+  <div class="modal-overlay" id="detailsModalOverlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="detailsModalTitle">Event Details</h3>
+        <button class="modal-close" onclick="closeDetailsModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="detailsModalContent">
+        <!-- Dynamic detail information -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="closeDetailsModal()">Close Details</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- QR Scan Modal -->
+  <div class="modal-overlay" id="qrScanModalOverlay">
+    <div class="modal-card" style="max-width: 450px;">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-qrcode" style="color: var(--accent-gold); margin-right: 8px;"></i> Live QR Scan Ticket Reader</h3>
+        <button class="modal-close" onclick="closeQRScanModal()">&times;</button>
+      </div>
+      <div class="modal-body" style="text-align: center; padding: 24px;">
+        <div id="qrScannerBox" style="width: 100%; height: 240px; border: 3px dashed var(--accent-gold); border-radius: var(--border-radius-md); display: flex; flex-direction: column; justify-content: center; align-items: center; background: #faf9f6; position: relative; overflow: hidden; margin-bottom: 16px;">
+          <!-- Moving green scanner line -->
+          <div class="scanner-laser" style="position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: #2ecc71; box-shadow: 0 0 8px #2ecc71;"></div>
+          <i class="fa-solid fa-qrcode" style="font-size: 5rem; color: var(--text-muted); opacity: 0.3; margin-bottom: 12px;"></i>
+          <span style="font-size: 0.9rem; font-weight: 500; color: var(--text-muted);">Place Guest QR Code Ticket in view</span>
+        </div>
+        <div class="form-group" style="text-align: left;">
+          <label class="form-label" for="qrScanGuestSelect">Select Guest Ticket to Simulate Scan:</label>
+          <select id="qrScanGuestSelect" class="form-control">
+            <!-- Dynamically populated from guest list -->
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeQRScanModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="simulateQRScan()">Simulate QR Code Scan <i class="fa-solid fa-circle-check"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Core API Services -->
+  <script src="services/api.js"></script>
+  <script src="services/auth.js"></script>
+  <script src="services/event.js"></script>
+  <script src="services/guest.js"></script>
+  <script src="services/rule.js"></script>
+  <script src="services/product.js"></script>
+  <script src="services/order.js"></script>
+  <script src="services/review.js"></script>
+
+  <!-- Core App Logic Javascript -->
+  <script src="app.js"></script>
+</body>
+</html>

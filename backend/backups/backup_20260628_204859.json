@@ -1,0 +1,287 @@
+{
+  "metadata": {
+    "timestamp": "2026-06-28 15:18:59.604526",
+    "created_by": "Boutique Admin",
+    "version": "1.0"
+  },
+  "events": [
+    {
+      "id": "evt-01",
+      "name": "Sabyasachi Heritage Trunk Show",
+      "type": "Trunk Show",
+      "date": "2026-06-15",
+      "time": "14:00:00",
+      "capacity": 30,
+      "designer": "Sabyasachi Mukherjee",
+      "notes": "Exquisite heritage zardozi, handwoven Banarasi sarees, and gold bridal lehengas. Premium high-security jewelry trunk on-site.",
+      "status": "Upcoming",
+      "branch": "Mumbai Colaba"
+    },
+    {
+      "id": "evt-02",
+      "name": "Private Silk Styling Consultation",
+      "type": "Private Shopping",
+      "date": "2026-06-20",
+      "time": "11:00:00",
+      "capacity": 8,
+      "designer": "Raw Mango & Ekaya Banaras",
+      "notes": "One-on-one draping styling consultations for selected Gold & Elite members. Focusing on lightweight summer silks.",
+      "status": "Upcoming",
+      "branch": "Mumbai Colaba"
+    },
+    {
+      "id": "evt-03",
+      "name": "Ritu Kumar Fusion Launch Party",
+      "type": "Designer Event",
+      "date": "2026-06-12",
+      "time": "10:00:00",
+      "capacity": 25,
+      "designer": "Ritu Kumar",
+      "notes": "Cocktails and designer preview showcase for modern fusion silhouettes, print collections, and light occasion wear.",
+      "status": "Live",
+      "branch": "Delhi Mehrauli"
+    },
+    {
+      "id": "evt-04",
+      "name": "Manish Malhotra Occasion Showcase",
+      "type": "Designer Event",
+      "date": "2026-06-02",
+      "time": "16:00:00",
+      "capacity": 40,
+      "designer": "Manish Malhotra",
+      "notes": "Velvet sherwanis, sequence sarees, and bespoke bridesmaid styling day. Concluded with high sales rate.",
+      "status": "Completed",
+      "branch": "Hyderabad Banjara"
+    }
+  ],
+  "guests": [
+    {
+      "id": "gst-01",
+      "event_id": "evt-01",
+      "name": "Radhika Merchant",
+      "email": "radhika@ambani.in",
+      "phone": "+91 99999 11111",
+      "vip": "Elite",
+      "rsvp": "Confirmed",
+      "checked_in": false,
+      "checkin_time": null,
+      "notes": "Requested emerald green drape match. High-priority fitting salon booking."
+    },
+    {
+      "id": "gst-02",
+      "event_id": "evt-01",
+      "name": "Isha Ambani",
+      "email": "isha@reliance.com",
+      "phone": "+91 99999 22222",
+      "vip": "Elite",
+      "rsvp": "Confirmed",
+      "checked_in": false,
+      "checkin_time": null,
+      "notes": "Requires direct assistance from lead showroom drape stylist."
+    },
+    {
+      "id": "gst-03",
+      "event_id": "evt-01",
+      "name": "Shloka Mehta",
+      "email": "shloka@rozi.in",
+      "phone": "+91 99999 33333",
+      "vip": "Elite",
+      "rsvp": "Pending",
+      "checked_in": false,
+      "checkin_time": null,
+      "notes": "Checking Banarasi collection previews."
+    },
+    {
+      "id": "gst-04",
+      "event_id": "evt-01",
+      "name": "Kareena Kapoor",
+      "email": "kareena.k@bollywood.com",
+      "phone": "+91 98200 44444",
+      "vip": "Gold",
+      "rsvp": "Confirmed",
+      "checked_in": false,
+      "checkin_time": null,
+      "notes": "Prefers deep neck blouses, pastel shades."
+    },
+    {
+      "id": "gst-05",
+      "event_id": "evt-02",
+      "name": "Nita Ambani",
+      "email": "nita@reliance.com",
+      "phone": "+91 99999 00000",
+      "vip": "Elite",
+      "rsvp": "Confirmed",
+      "checked_in": false,
+      "checkin_time": null,
+      "notes": "Elite slot. Inquiring about traditional hand-drawn kalamkari fabrics."
+    },
+    {
+      "id": "gst-06",
+      "event_id": "evt-02",
+      "name": "Mira Rajput",
+      "email": "mira.r@kapoor.co",
+      "phone": "+91 98199 55555",
+      "vip": "Gold",
+      "rsvp": "Confirmed",
+      "checked_in": false,
+      "checkin_time": null,
+      "notes": "Interested in contemporary pastel fusion sarees."
+    },
+    {
+      "id": "gst-07",
+      "event_id": "evt-03",
+      "name": "Alia Bhatt",
+      "email": "alia@kapoor.com",
+      "phone": "+91 98111 66666",
+      "vip": "Elite",
+      "rsvp": "Confirmed",
+      "checked_in": true,
+      "checkin_time": "10:15",
+      "notes": "Prefers organic cotton prints and light flowy fusion silhouettes."
+    },
+    {
+      "id": "gst-08",
+      "event_id": "evt-03",
+      "name": "Kiara Advani",
+      "email": "kiara@advani.com",
+      "phone": "+91 98222 77777",
+      "vip": "Elite",
+      "rsvp": "Confirmed",
+      "checked_in": true,
+      "checkin_time": "10:22",
+      "notes": "Assigned designer suite #2. Interested in zardozi overlays."
+    },
+    {
+      "id": "gst-09",
+      "event_id": "evt-03",
+      "name": "Deepika Padukone",
+      "email": "deepika@padukone.co.in",
+      "phone": "+91 98333 88888",
+      "vip": "Elite",
+      "rsvp": "Confirmed",
+      "checked_in": true,
+      "checkin_time": "10:05",
+      "notes": "Pregnant collection draping assistance. Prefers comfortable silk fabrics."
+    },
+    {
+      "id": "gst-10",
+      "event_id": "evt-03",
+      "name": "Sonam Kapoor",
+      "email": "sonam@ahuja.com",
+      "phone": "+91 98444 99999",
+      "vip": "Gold",
+      "rsvp": "Confirmed",
+      "checked_in": false,
+      "checkin_time": null,
+      "notes": "Running late. High-fashion custom fittings request."
+    },
+    {
+      "id": "gst-11",
+      "event_id": "evt-03",
+      "name": "Ananya Panday",
+      "email": "ananya@panday.co",
+      "phone": "+91 98555 00000",
+      "vip": "Regular",
+      "rsvp": "Confirmed",
+      "checked_in": true,
+      "checkin_time": "10:45",
+      "notes": "Social media buzz photo opt scheduled."
+    },
+    {
+      "id": "gst-12",
+      "event_id": "evt-03",
+      "name": "Janhvi Kapoor",
+      "email": "janhvi@kapoor.co",
+      "phone": "+91 98666 11111",
+      "vip": "Regular",
+      "rsvp": "Confirmed",
+      "checked_in": false,
+      "checkin_time": null,
+      "notes": "Attending launch photoshoot."
+    },
+    {
+      "id": "gst-13",
+      "event_id": "evt-04",
+      "name": "Kriti Sanon",
+      "email": "kriti@sanon.in",
+      "phone": "+91 98777 22222",
+      "vip": "Gold",
+      "rsvp": "Confirmed",
+      "checked_in": true,
+      "checkin_time": "16:15",
+      "notes": "Purchased heavy velvet bridal gown. Outstanding client feedback."
+    },
+    {
+      "id": "gst-14",
+      "event_id": "evt-04",
+      "name": "Katrina Kaif",
+      "email": "katrina@vicky.com",
+      "phone": "+91 98888 33333",
+      "vip": "Elite",
+      "rsvp": "Confirmed",
+      "checked_in": true,
+      "checkin_time": "16:05",
+      "notes": "Purchased customized pastel saree collection."
+    }
+  ],
+  "products": [
+    {
+      "id": 1,
+      "title": "Sabyasachi Heritage Banarasi Saree",
+      "description": "Exquisite handwoven Banarasi silk saree with authentic zardozi embroidery.",
+      "price": 250000.0,
+      "category": "Saree",
+      "image": "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=500",
+      "stock": 2,
+      "status": "Available",
+      "branch": "Mumbai Colaba"
+    },
+    {
+      "id": 2,
+      "title": "Raw Mango Lightweight Organza Saree",
+      "description": "Sheer organza saree with delicate floral motifs, perfect for summer styling.",
+      "price": 45000.0,
+      "category": "Saree",
+      "image": "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=500",
+      "stock": 5,
+      "status": "Available",
+      "branch": "Mumbai Colaba"
+    },
+    {
+      "id": 3,
+      "title": "Ritu Kumar Printed Fusion Gown",
+      "description": "Modern print fusion gown combining traditional embroidery with contemporary cuts.",
+      "price": 35000.0,
+      "category": "Gown",
+      "image": "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=500",
+      "stock": 8,
+      "status": "Available",
+      "branch": "Delhi Mehrauli"
+    },
+    {
+      "id": 4,
+      "title": "Manish Malhotra Velvet Sherwani",
+      "description": "Deep maroon velvet groom's sherwani with intricate gold thread workmanship.",
+      "price": 180000.0,
+      "category": "Sherwani",
+      "image": "https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?w=500",
+      "stock": 1,
+      "status": "Available",
+      "branch": "Hyderabad Banjara"
+    }
+  ],
+  "rules": [
+    {
+      "key": "vipWarningPercent",
+      "value": 90
+    },
+    {
+      "key": "minAdvanceDays",
+      "value": 3
+    },
+    {
+      "key": "maxEliteRsvps",
+      "value": 25
+    }
+  ]
+}

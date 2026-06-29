@@ -1,0 +1,19 @@
+[2026-06-17 10:26:39] [ERROR]: FastAPI verification error: Request failed with status code 500
+[2026-06-17 10:27:18] [ERROR]: FastAPI verification error: Request failed with status code 500
+[2026-06-18 12:09:24] [ERROR]: Token verification failure: jwt expired
+[2026-06-28 19:30:12] [ERROR]: Unhandle Gateway Error: SyntaxError: Expected property name or '}' in JSON at position 1 (line 1 column 2)
+    at JSON.parse (<anonymous>)
+    at parse (C:\Users\Teja goud\Documents\internship project\node_modules\body-parser\lib\types\json.js:92:19)
+    at C:\Users\Teja goud\Documents\internship project\node_modules\body-parser\lib\read.js:128:18
+    at AsyncResource.runInAsyncScope (node:async_hooks:227:14)
+    at invokeCallback (C:\Users\Teja goud\Documents\internship project\node_modules\raw-body\index.js:238:16)
+    at done (C:\Users\Teja goud\Documents\internship project\node_modules\raw-body\index.js:227:7)
+    at IncomingMessage.onEnd (C:\Users\Teja goud\Documents\internship project\node_modules\raw-body\index.js:287:7)
+    at IncomingMessage.emit (node:events:509:28)
+    at endReadableNT (node:internal/streams/readable:1735:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+[2026-06-28 19:33:15] [ERROR]: Token verification failure: jwt expired
+[2026-06-28 20:51:43] [ERROR]: Token verification failure: jwt expired
+[2026-06-28 20:51:59] [ERROR]: Token verification failure: jwt expired
+[2026-06-28 20:52:56] [ERROR]: FastAPI error (400): Invalid HTTP request received.
+[2026-06-29 07:48:30] [ERROR]: Token verification failure: jwt expired

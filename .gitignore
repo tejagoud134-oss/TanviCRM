@@ -1,0 +1,17 @@
+# Node modules
+node_modules/
+
+# Python caching
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Environment files
+.env
+
+# Local Database
+*.db
+*.sqlite
+
+# IDE configs
+.vscode/

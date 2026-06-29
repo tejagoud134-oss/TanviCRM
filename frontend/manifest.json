@@ -1,0 +1,22 @@
+{
+  "name": "Tanvi Boutique Event Management Suite",
+  "short_name": "Tanvi Events",
+  "description": "Fashion Event & Trunk Show Management System for Tanvi Boutique",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#0A3C30",
+  "theme_color": "#0A3C30",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3050/3050239.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3050/3050239.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
