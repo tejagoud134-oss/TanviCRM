@@ -34,9 +34,12 @@ apiClient.interceptors.response.use(
   async error => {
     const status = error.response ? error.response.status : null;
     
-    // Check if it's a network error (server is offline or localtunnel is not connected)
-    if (!error.response || status === 502 || status === 504) {
-      console.warn('Backend server unreachable. Falling back to Browser LocalStorage Database Mode.');
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    // Fallback to mock DB on Vercel for any error, or on localhost if server is offline/unavailable
+    const shouldFallback = !isLocalhost || !error.response || status === 502 || status === 504 || status === 404;
+
+    if (shouldFallback) {
+      console.warn('Redirecting request to Browser LocalStorage Database Mode.');
       try {
         const mockResponse = await handleMockRequest(error.config);
         return mockResponse; // Return resolved mock data back to the calling service
