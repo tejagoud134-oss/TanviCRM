@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tanvi-events-cache-v1';
+const CACHE_NAME = 'tanvi-events-cache-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -21,6 +21,7 @@ self.addEventListener('install', (event) => {
       return cache.addAll(ASSETS_TO_CACHE);
     })
   );
+  self.skipWaiting(); // Force activation immediately
 });
 
 self.addEventListener('activate', (event) => {
@@ -29,23 +30,42 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         keys.map((key) => {
           if (key !== CACHE_NAME) {
+            console.log('Clearing old service worker cache:', key);
             return caches.delete(key);
           }
         })
       );
-    })
+    }).then(() => self.clients.claim())
   );
 });
 
 self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      return cachedResponse || fetch(event.request).catch(() => {
-        // Fallback for document requests when offline
-        if (event.request.headers.get('accept').includes('text/html')) {
-          return caches.match('/index.html');
-        }
-      });
-    })
-  );
+  const isJs = event.request.url.includes('.js');
+  
+  if (isJs) {
+    // Network-First for JS files to ensure they get live updates instantly
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (!response || response.status !== 200) return response;
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseClone);
+          });
+          return response;
+        })
+        .catch(() => caches.match(event.request))
+    );
+  } else {
+    // Cache-First for static assets (HTML, CSS, JSON)
+    event.respondWith(
+      caches.match(event.request).then((cachedResponse) => {
+        return cachedResponse || fetch(event.request).catch(() => {
+          if (event.request.headers.get('accept').includes('text/html')) {
+            return caches.match('/index.html');
+          }
+        });
+      })
+    );
+  }
 });
