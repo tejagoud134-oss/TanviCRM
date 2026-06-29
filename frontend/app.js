@@ -47,7 +47,7 @@ function connectSocket() {
   // Connect to socket server directly on production (Vercel rewrites do not support WS proxying)
   const socketUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? ''
-    : 'https://YOUR_BACKEND_URL'; // Replace with your actual deployed backend URL (e.g. Render/Railway)
+    : 'https://few-yaks-worry.loca.lt';
   
   socket = io(socketUrl);
 

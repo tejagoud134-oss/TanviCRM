@@ -3,7 +3,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://YOUR_BACKEND_URL/api/:path*"
+      "destination": "https://few-yaks-worry.loca.lt/api/:path*"
     },
     {
       "source": "/(.*)",
